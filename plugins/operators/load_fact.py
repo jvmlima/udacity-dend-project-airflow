@@ -8,8 +8,6 @@ class LoadFactOperator(BaseOperator):
 
     ui_color = '#F98866'
 
-    drop_sql = "DROP TABLE IF EXISTS {};"
-
     insert_sql = """ 
         INSERT INTO {}
         {};
@@ -32,12 +30,8 @@ class LoadFactOperator(BaseOperator):
         # setup ---
         redshift_hook = PostgresHook(self.redshift_conn_id)
 
-        # drop table ---
-        self.log.info(f'Dropping {self.table}')
-        redshift_hook.run(LoadFactOperator.drop_sql.format(self.table))
-
-        # create table ---
-        self.log.info(f'Creating {self.table}')
+        # create table if not exists ---
+        self.log.info(f'Creating {self.table} if not exists')
         redshift_hook.run(SqlQueries.create_table_queries.get(self.table))
 
         # insert into table ---

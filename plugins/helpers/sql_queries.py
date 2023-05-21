@@ -5,7 +5,7 @@ class SqlQueries:
     # Stating ---
 
     staging_events_table_create = ("""
-        CREATE TABLE public.staging_events (
+        CREATE TABLE IF NOT EXISTS public.staging_events (
             artist varchar(256),
             auth varchar(256),
             firstname varchar(256),
@@ -47,7 +47,7 @@ class SqlQueries:
     # Fact ---
 
     songplay_table_create = ("""
-        CREATE TABLE public.songplays (
+        CREATE TABLE IF NOT EXISTS public.songplays (
             playid varchar(32) NOT NULL,
             start_time timestamp NOT NULL,
             userid int4 NOT NULL,
@@ -64,7 +64,7 @@ class SqlQueries:
     # Dimensions ---
 
     user_table_create = ("""
-        CREATE TABLE public.users (
+        CREATE TABLE IF NOT EXISTS public.users (
             userid int4 NOT NULL,
             first_name varchar(256),
             last_name varchar(256),
@@ -75,7 +75,7 @@ class SqlQueries:
     """)
 
     song_table_create = ("""
-        CREATE TABLE public.songs (
+        CREATE TABLE IF NOT EXISTS public.songs (
             songid varchar(256) NOT NULL,
             title varchar(256),
             artistid varchar(256),
@@ -86,7 +86,7 @@ class SqlQueries:
     """)
 
     artist_table_create = ("""
-        CREATE TABLE public.artists (
+        CREATE TABLE IF NOT EXISTS public.artists (
             artistid varchar(256) NOT NULL,
             name varchar(256),
             location varchar(256),
@@ -96,7 +96,7 @@ class SqlQueries:
     """)
 
     time_table_create = ("""
-        CREATE TABLE public."times" (
+        CREATE TABLE IF NOT EXISTS public."times" (
             start_time timestamp NOT NULL,
             "hour" int4,
             "day" int4,
