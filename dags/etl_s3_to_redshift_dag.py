@@ -8,20 +8,19 @@ from helpers import SqlQueries
 
 default_args = {
     'owner': 'jlima',
-    'start_date': datetime(2023, 5, 20),
+    'start_date': datetime.now() - timedelta(hours = 1, minutes = 0),
     'depends_on_past': False,
-    'retries': 0,
+    'retries': 3,
     'retry_delay': 300, # 5 minutes
     'catchup': False,
-    'email_on_retry': False,
-    'schedule_interval': '@once'
+    'email_on_retry': False
 }
 
 dag = DAG(
     'etl_s3_to_redshift',
     default_args = default_args,
-    description = 'Load and transform data in Redshift with Airflow'
-    # schedule_interval = '0 * * * *'
+    description = 'Load and transform data in Redshift with Airflow',
+    schedule_interval = '@hourly'
     )
 
 start_operator = EmptyOperator(task_id='Begin_execution',  dag=dag)
@@ -35,9 +34,7 @@ stage_events_to_redshift = StageToRedshiftOperator(
     s3_bucket = 'udacity-dend',
     s3_prefix = 'log_data',
     format_json = "FORMAT AS JSON 's3://udacity-dend/log_json_path.json' REGION 'us-west-2'"
-    # 's3://udacity-jlima/log-data/log_json_path.json'
 )
-
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id = 'Stage_songs',
@@ -46,7 +43,7 @@ stage_songs_to_redshift = StageToRedshiftOperator(
     redshift_conn_id = 'redshift',
     table = 'staging_songs',
     s3_bucket = 'udacity-dend',
-    s3_prefix = 'song_data',
+    s3_prefix = 'song_data/A/A/A',
     format_json = "FORMAT AS JSON 'auto' REGION 'us-west-2'"
 )
 
@@ -61,28 +58,32 @@ load_user_dimension_table = LoadDimensionOperator(
     task_id='Load_user_dim_table',
     dag=dag,
     redshift_conn_id = 'redshift',
-    table = 'users'
+    table = 'users',
+    mode = 'truncate-insert' # 'append' or 'truncate-insert'
 )
 
 load_song_dimension_table = LoadDimensionOperator(
     task_id='Load_song_dim_table',
     dag=dag,
     redshift_conn_id = 'redshift',
-    table = 'songs'
+    table = 'songs',
+    mode = 'truncate-insert' # 'append' or 'truncate-insert'
 )
 
 load_artist_dimension_table = LoadDimensionOperator(
     task_id='Load_artist_dim_table',
     dag=dag,
     redshift_conn_id = 'redshift',
-    table = 'artists'
+    table = 'artists',
+    mode = 'truncate-insert' # 'append' or 'truncate-insert'
 )
 
 load_time_dimension_table = LoadDimensionOperator(
     task_id='Load_time_dim_table',
     dag=dag,
     redshift_conn_id = 'redshift',
-    table = 'times'
+    table = 'times',
+    mode = 'truncate-insert' # 'append' or 'truncate-insert'
 )
 
 run_quality_checks = DataQualityOperator(
